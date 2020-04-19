@@ -1,4 +1,4 @@
-package cykb.sn.time;
+package com.sn.time;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
