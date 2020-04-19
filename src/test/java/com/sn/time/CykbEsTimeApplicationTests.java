@@ -2,17 +2,19 @@ package com.sn.time;
 
 import com.sn.time.elasticsearch.dao.ElasticSearchDao;
 import com.sn.time.elasticsearch.entity.ElasticSearch;
-import com.sn.time.strategy.SourceContent;
 import io.searchbox.core.SearchResult;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
+@Slf4j
 class CykbEsTimeApplicationTests {
 
     @Autowired
@@ -43,7 +45,25 @@ class CykbEsTimeApplicationTests {
     @Test
     void test2() {
         try {
-
+            String novelsId = "hRlcg3EBj8NokppAwbyT";
+            ElasticSearch elasticSearch = ElasticSearch.builder().index("chapters_index").type("chapters").sort("updateTime").order("asc").build();
+            Map<String, Object> termParams = new HashMap<String, Object>(2) {{
+                put("novelsId", novelsId);
+            }};
+            List<SearchResult.Hit<Object, Void>> src = new ArrayList<>();
+            try {
+                src = elasticSearchDao.mustTermRangeQuery(elasticSearch, termParams, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("findByNovelsId-fail: {}", e.getMessage());
+            }
+            List<Map<String, Object>> target = new ArrayList<>();
+            for (SearchResult.Hit<Object, Void> objectVoidHit : src) {
+                Map<String, Object> temp = new HashMap<>(2);
+                temp.put("chapter", ((Map) objectVoidHit.source).get("chapter"));
+                temp.put("updateTime", ((Map) objectVoidHit.source).get("updateTime"));
+                target.add(temp);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -41,8 +41,8 @@ public class ChaptersServiceImpl implements ChaptersService {
         List<Map<String, Object>> target = new ArrayList<>();
         for (SearchResult.Hit<Object, Void> objectVoidHit : src) {
             Map<String, Object> temp = new HashMap<>(2);
-            temp.put("chapter", ((Map) objectVoidHit).get("chapter"));
-            temp.put("updateTime", ((Map) objectVoidHit).get("updateTime"));
+            temp.put("chapter", ((Map) objectVoidHit.source).get("chapter"));
+            temp.put("updateTime", ((Map) objectVoidHit.source).get("updateTime"));
             target.add(temp);
         }
         return target;
