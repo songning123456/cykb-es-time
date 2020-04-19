@@ -38,7 +38,7 @@ public class Schedule {
     public void updateLatest() {
         try {
             List<String> sourceList = Arrays.asList("笔趣阁", "147小说", "天天书吧", "飞库小说", "趣书吧");
-            ElasticSearch elasticSearch = ElasticSearch.builder().index("novels_index").type("novels").sort("createTime").order("desc").build();
+            ElasticSearch elasticSearch = ElasticSearch.builder().index("novels_index").type("novels").sort("createTime").build();
             for (String sourceName : sourceList) {
                 sourceExecutor.execute(() -> {
                     try {
@@ -50,8 +50,8 @@ public class Schedule {
                         for (int i = 0, length = src.size(); i < length - 1; i++) {
                             Map<String, Object> map = new HashMap<>(2);
                             map.put("novelsId", src.get(i).id);
-                            map.put("sourceName", ((Map) src.get(i)).get("sourceName"));
-                            map.put("sourceUrl", ((Map) src.get(i)).get("sourceUrl"));
+                            map.put("sourceName", ((Map) src.get(i).source).get("sourceName"));
+                            map.put("sourceUrl", ((Map) src.get(i).source).get("sourceUrl"));
                             SourceContent.doSource(map);
                         }
                     } catch (Exception e) {
