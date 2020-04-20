@@ -33,10 +33,10 @@ public class YisiqiSourceServiceImpl implements SourceService {
         String lastChapter = String.valueOf(isExistList.get(isExistList.size() - 1).get("chapter"));
         if (!latestChapter.equals(lastChapter)) {
             Elements ddElements = baseDoc.getElementById("list").getElementsByTag("dd");
-            Date oldUpdateTime = (Date) isExistList.get(isExistList.size() - 1).get("updateTime");
+            String oldUpdateTime = isExistList.get(isExistList.size() - 1).get("updateTime").toString();
             String strUpdateTime = baseDoc.getElementById("info").getElementsByTag("p").get(2).html().split("：")[1];
             Date newUpdateTime = DateUtil.strToDate(strUpdateTime, "yyyy-MM-dd HH:mm:ss");
-            List<String> timeList = DateUtil.stepTime(oldUpdateTime, newUpdateTime, ddElements.size() - isExistList.size());
+            List<String> timeList = DateUtil.stepTime(DateUtil.strToDate(oldUpdateTime, "yyyy-MM-dd HH:mm:ss"), newUpdateTime, ddElements.size() - isExistList.size());
             for (int i = isExistList.size(), iLen = ddElements.size(); i < iLen; i++) {
                 Element chapterElement = ddElements.get(i).getElementsByTag("a").get(0);
                 String chapter = chapterElement.html();

@@ -35,14 +35,14 @@ public class FeikuSourceServiceImpl implements SourceService {
             String listUrl = baseDoc.getElementsByClass("catalogbtn").get(0).attr("href");
             Document listDoc = HttpUtil.getHtmlFromUrl(listUrl, true);
             Elements chapterList = listDoc.getElementsByClass("chapter-list").get(0).getElementsByTag("a");
-            Date oldUpdateTime = (Date) isExistList.get(isExistList.size() - 1).get("updateTime");
+            String oldUpdateTime = isExistList.get(isExistList.size() - 1).get("updateTime").toString();
             Element bookInfo = baseDoc.getElementsByClass("book-intro").get(0);
             String paramTime = bookInfo.getElementsByTag("b").get(1).html();
             int left = paramTime.indexOf("(");
             int right = paramTime.indexOf(")");
             String strUpdateTime = paramTime.substring(left + 1, right) + " 00:00:00";
             Date newUpdateTime = DateUtil.strToDate(strUpdateTime, "yyyy-MM-dd HH:mm:ss");
-            List<String> timeList = DateUtil.stepTime(oldUpdateTime, newUpdateTime, chapterList.size() - isExistList.size());
+            List<String> timeList = DateUtil.stepTime(DateUtil.strToDate(oldUpdateTime, "yyyy-MM-dd HH:mm:ss"), newUpdateTime, chapterList.size() - isExistList.size());
             for (int i = isExistList.size(), iLen = chapterList.size(); i < iLen; i++) {
                 String chapter = chapterList.get(i).html();
                 boolean isExist = false;

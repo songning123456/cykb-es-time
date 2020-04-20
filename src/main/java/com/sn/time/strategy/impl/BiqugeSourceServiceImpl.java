@@ -36,10 +36,10 @@ public class BiqugeSourceServiceImpl implements SourceService {
         if (!latestChapter.equals(lastChapter)) {
             Element dlElement = categoryDoc.getElementById("list").getElementsByTag("dl").get(0);
             Elements ddList = dlElement.getElementsByTag("dd");
-            Date oldUpdateTime = (Date) isExistList.get(isExistList.size() - 1).get("updateTime");
+            String oldUpdateTime = isExistList.get(isExistList.size() - 1).get("updateTime").toString();
             String strUpdateTime = infoElement.getElementsByTag("p").get(2).html().split("：")[1];
             Date newUpdateTime = DateUtil.strToDate(strUpdateTime, "yyyy-MM-dd HH:mm:ss");
-            List<String> timeList = DateUtil.stepTime(oldUpdateTime, newUpdateTime, ddList.size() - isExistList.size());
+            List<String> timeList = DateUtil.stepTime(DateUtil.strToDate(oldUpdateTime, "yyyy-MM-dd HH:mm:ss"), newUpdateTime, ddList.size() - isExistList.size());
             for (int i = isExistList.size(), iLen = ddList.size(); i < iLen; i++) {
                 Element a = ddList.get(i).getElementsByTag("a").get(0);
                 String chapter = a.html();
