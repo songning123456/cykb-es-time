@@ -104,8 +104,13 @@ public class ChaptersServiceImpl implements ChaptersService {
                         String novelsId = String.valueOf(((Map) item.source).get("novelsId"));
                         String updateTime = String.valueOf(((Map) item.source).get("updateTime"));
                         Chapters chapters = Chapters.builder().chapter(chapter).content(content).contentUrl(contentUrl).novelsId(novelsId).updateTime(updateTime).build();
-                        elasticSearchDao.update(chaptersEsSearch, chaptersId, chapters);
-                        log.info("当前小说novelsId: {}; 更新章节chapter: {}", novelsId, chapter);
+                        Map entityMap = (Map) elasticSearchDao.findById(chaptersEsSearch, chaptersId);
+                        if ("暂无资源...".equals(entityMap.get("content"))) {
+                            elasticSearchDao.update(chaptersEsSearch, chaptersId, chapters);
+                            log.info("当前小说novelsId: {}; 更新章节chapter: {}", novelsId, chapter);
+                        } else {
+                            log.info("novelsId: {}, 中间文本内容已经更新chapter: {}", novelsId, chapter);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         log.error("更新chapterId:{} fail", item.id);
