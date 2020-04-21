@@ -139,6 +139,49 @@ public class ElasticSearchDao {
         return searchResult.getHits(Object.class);
     }
 
+    public SearchResult mustTermRangeQueryWithTotal(ElasticSearch elasticSearch, Map<String, Object> termParams, List<Range> rangeList) throws Exception {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if (termParams != null && !termParams.isEmpty()) {
+            for (Map.Entry<String, Object> item : termParams.entrySet()) {
+                boolQueryBuilder.must(QueryBuilders.termQuery(item.getKey(), item.getValue()));
+            }
+        }
+        if (rangeList != null && !rangeList.isEmpty()) {
+            for (Range range : rangeList) {
+                if (StringUtils.isEmpty(range.getMin()) && StringUtils.isEmpty(range.getMax())) {
+                    continue;
+                }
+                if (StringUtils.isEmpty(range.getGtOrGte()) && StringUtils.isEmpty(range.getLtOrLte())) {
+                    continue;
+                }
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(range.getRangeName());
+                if (!StringUtils.isEmpty(range.getMin()) && "gt".equals(range.getGtOrGte())) {
+                    rangeQueryBuilder.gt(range.getMin());
+                } else if (!StringUtils.isEmpty(range.getMin()) && "gte".equals(range.getGtOrGte())) {
+                    rangeQueryBuilder.gte(range.getMin());
+                }
+                if (!StringUtils.isEmpty(range.getMax()) && "lt".equals(range.getLtOrLte())) {
+                    rangeQueryBuilder.lt(range.getMax());
+                } else if (!StringUtils.isEmpty(range.getMax()) && "lte".equals(range.getLtOrLte())) {
+                    rangeQueryBuilder.lte(range.getMax());
+                }
+                boolQueryBuilder.must(rangeQueryBuilder);
+            }
+        }
+        searchSourceBuilder.query(boolQueryBuilder);
+        searchSourceBuilder.from(elasticSearch.getFrom()).size(elasticSearch.getSize());
+        if (!StringUtils.isEmpty(elasticSearch.getSort()) && ("ASC".equals(elasticSearch.getOrder()) || "asc".equals(elasticSearch.getOrder()))) {
+            searchSourceBuilder.sort(elasticSearch.getSort(), SortOrder.ASC);
+        } else if (!StringUtils.isEmpty(elasticSearch.getSort()) && ("DESC".equals(elasticSearch.getOrder()) || "desc".equals(elasticSearch.getOrder()))) {
+            searchSourceBuilder.sort(elasticSearch.getSort(), SortOrder.DESC);
+        }
+        String query = searchSourceBuilder.toString();
+        Search search = new Search.Builder(query).addIndex(elasticSearch.getIndex()).addType(elasticSearch.getType()).build();
+        SearchResult searchResult = jestClient.execute(search);
+        return searchResult;
+    }
+
     public List<SearchResult.Hit<Object, Void>> mustTermsRangeQuery(ElasticSearch elasticSearch, Map<String, String[]> termsParams, List<Range> rangeList) throws Exception {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
