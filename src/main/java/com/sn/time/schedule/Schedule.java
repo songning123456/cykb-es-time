@@ -20,7 +20,7 @@ public class Schedule {
     private ChaptersService chaptersService;
 
     /**
-     * 更新小说的最新章节，content用 暂无资源... 代替
+     * 更新小说的最新章节
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void updateLatestChapters() {
@@ -29,19 +29,6 @@ public class Schedule {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("updateLatestChapter fail: {}", e.getMessage());
-        }
-    }
-
-    /**
-     * 暂无资源... 替换成 具体文本内容
-     */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void updateNonContent() {
-        try {
-            chaptersService.updateContent();
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("updateNonContent fail: {}", e.getMessage());
         }
     }
 }
