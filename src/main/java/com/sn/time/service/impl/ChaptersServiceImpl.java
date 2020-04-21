@@ -39,7 +39,7 @@ public class ChaptersServiceImpl implements ChaptersService {
             if (src != null && !src.isEmpty()) {
                 for (SearchResult.Hit<Object, Void> item : src) {
                     String sourceUrl = String.valueOf(((Map) item.source).get("sourceUrl"));
-                    String novelsId = String.valueOf(((Map) item.source).get("novelsId"));
+                    String novelsId = item.id;
                     Document listDoc = HttpUtil.getHtmlFromUrl(sourceUrl, true);
                     String latestChapter = listDoc.getElementById("info").getElementsByTag("p").get(3).getElementsByTag("a").get(0).html();
                     List<Map<String, Object>> isExistList = this.findByNovelsId(novelsId);
