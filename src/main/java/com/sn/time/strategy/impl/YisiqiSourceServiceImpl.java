@@ -1,10 +1,7 @@
 package com.sn.time.strategy.impl;
 
 import com.sn.time.entity.Chapters;
-import com.sn.time.service.ChaptersService;
 import com.sn.time.service.impl.ChaptersServiceImpl;
-import com.sn.time.strategy.SourceService;
-import com.sn.time.util.BeanUtil;
 import com.sn.time.util.DateUtil;
 import com.sn.time.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +18,7 @@ import java.util.Map;
  * @date: 2020/4/5 15:09
  */
 @Slf4j
-public class YisiqiSourceServiceImpl implements SourceService {
+public class YisiqiSourceServiceImpl {
     @Override
     public void updateChapter(Map<String, Object> map) {
         String sourceUrl = String.valueOf(map.get("sourceUrl"));

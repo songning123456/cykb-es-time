@@ -2,7 +2,6 @@ package com.sn.time;
 
 import com.sn.time.elasticsearch.dao.ElasticSearchDao;
 import com.sn.time.elasticsearch.entity.ElasticSearch;
-import com.sn.time.strategy.SourceContent;
 import io.searchbox.core.SearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

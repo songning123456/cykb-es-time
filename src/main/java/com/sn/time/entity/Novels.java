@@ -31,4 +31,6 @@ public class Novels {
     private String sourceUrl;
 
     private String sourceName;
+
+    private String status;
 }
