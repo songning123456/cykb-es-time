@@ -97,10 +97,16 @@ public class ChaptersServiceImpl implements ChaptersService {
                 for (SearchResult.Hit<Object, Void> item : src) {
                     try {
                         String chaptersId = item.id;
+                        String content = "暂无资源...";
                         String chapter = String.valueOf(((Map) item.source).get("chapter"));
                         String contentUrl = String.valueOf(((Map) item.source).get("contentUrl"));
-                        Document contentDoc = HttpUtil.getHtmlFromUrl(contentUrl, true);
-                        String content = contentDoc.getElementById("content").html();
+                        try {
+                            Document contentDoc = HttpUtil.getHtmlFromUrl(contentUrl, true);
+                            content = contentDoc.getElementById("content").html();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("更新最新章节chaptersId: {} fail", chaptersId);
+                        }
                         String novelsId = String.valueOf(((Map) item.source).get("novelsId"));
                         String updateTime = String.valueOf(((Map) item.source).get("updateTime"));
                         Chapters chapters = Chapters.builder().chapter(chapter).content(content).contentUrl(contentUrl).novelsId(novelsId).updateTime(updateTime).build();
