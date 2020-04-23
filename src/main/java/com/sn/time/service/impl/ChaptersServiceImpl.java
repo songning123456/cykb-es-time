@@ -62,8 +62,14 @@ public class ChaptersServiceImpl implements ChaptersService {
                             }
                             if (!isExist) {
                                 String contentUrl = "http://www.147xiaoshuo.com/" + chapterElement.attr("href");
-                                Document contentDoc = HttpUtil.getHtmlFromUrl(contentUrl, true);
-                                String content = contentDoc.getElementById("content").html();
+                                String content = "暂无资源...";
+                                try {
+                                    Document contentDoc = HttpUtil.getHtmlFromUrl(contentUrl, true);
+                                    content = contentDoc.getElementById("content").html();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    log.error("更新(latestChapter)最新章节contentUrl: {} fail", contentUrl);
+                                }
                                 Chapters chapters = Chapters.builder().chapter(chapter).content(content).contentUrl(contentUrl).novelsId(novelsId).updateTime(timeList.get(i - isExistList.size())).build();
                                 ElasticSearch chaptersEsSearch = ElasticSearch.builder().index("chapters_index").type("chapters").build();
                                 elasticSearchDao.save(chaptersEsSearch, chapters);
@@ -105,7 +111,7 @@ public class ChaptersServiceImpl implements ChaptersService {
                             content = contentDoc.getElementById("content").html();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            log.error("更新最新章节chaptersId: {} fail", chaptersId);
+                            log.error("更新(content)文本内容chaptersId: {} fail", chaptersId);
                         }
                         String novelsId = String.valueOf(((Map) item.source).get("novelsId"));
                         String updateTime = String.valueOf(((Map) item.source).get("updateTime"));
