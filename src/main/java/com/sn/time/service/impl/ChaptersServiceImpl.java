@@ -91,58 +91,6 @@ public class ChaptersServiceImpl implements ChaptersService {
         }
     }
 
-    @Override
-    public void updateContent() {
-        int recordStartNo = 0;
-        int pageRecordNum = 10000;
-        long total = 10000;
-        try {
-            Map<String, Object> termParams = new HashMap<String, Object>(2) {{
-                put("content", "暂无资源...");
-            }};
-            while (pageRecordNum <= total) {
-                ElasticSearch chaptersEsSearch = ElasticSearch.builder().index("chapters_index").type("chapters").from(recordStartNo).size(pageRecordNum).sort("updateTime").order("asc").build();
-                SearchResult searchResult = elasticSearchDao.mustTermRangeQueryWithTotal(chaptersEsSearch, termParams, null);
-                total = searchResult.getTotal();
-                List<SearchResult.Hit<Object, Void>> src = searchResult.getHits(Object.class);
-                for (SearchResult.Hit<Object, Void> item : src) {
-                    try {
-                        String chaptersId = item.id;
-                        String content = "暂无资源...";
-                        String chapter = String.valueOf(((Map) item.source).get("chapter"));
-                        String contentUrl = String.valueOf(((Map) item.source).get("contentUrl"));
-                        try {
-                            Document contentDoc = HttpUtil.getHtmlFromUrl(contentUrl, true);
-                            content = contentDoc.getElementById("content").html();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            log.error("更新(content)文本内容chaptersId: {} fail", chaptersId);
-                        }
-                        String novelsId = String.valueOf(((Map) item.source).get("novelsId"));
-                        String updateTime = String.valueOf(((Map) item.source).get("updateTime"));
-                        Chapters chapters = Chapters.builder().chapter(chapter).content(content).contentUrl(contentUrl).novelsId(novelsId).updateTime(updateTime).build();
-                        Map entityMap = (Map) elasticSearchDao.findById(chaptersEsSearch, chaptersId);
-                        if ("暂无资源...".equals(entityMap.get("content"))) {
-                            elasticSearchDao.update(chaptersEsSearch, chaptersId, chapters);
-                            log.info("当前小说novelsId: {}; 更新章节chapter: {}", novelsId, chapter);
-                        } else {
-                            log.info("novelsId: {}, 中间文本内容已经更新chapter: {}", novelsId, chapter);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        log.error("更新chapterId:{} fail", item.id);
-                    }
-                }
-                recordStartNo = recordStartNo + 10000;
-                pageRecordNum = pageRecordNum + 10000;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("~~~查询所有内容失败!~~~");
-        }
-
-    }
-
     private List<Map<String, Object>> findByNovelsId(String novelsId) {
         ElasticSearch elasticSearch = ElasticSearch.builder().index("chapters_index").type("chapters").sort("updateTime").order("asc").build();
         Map<String, Object> termParams = new HashMap<String, Object>(2) {{

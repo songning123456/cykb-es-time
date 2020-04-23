@@ -7,6 +7,4 @@ package com.sn.time.service;
 public interface ChaptersService {
 
     void updateLatestChapter();
-
-    void updateContent();
 }
